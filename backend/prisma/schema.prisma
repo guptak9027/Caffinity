@@ -5,11 +5,132 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+enum Role {
+  EMPLOYEE
+  ADMIN
+  FACILITY_MANAGER
+}
+
+enum SeatStatus {
+  AVAILABLE
+  RESERVED
+  OCCUPIED
+  MAINTENANCE
+}
+
+enum BookingStatus {
+  RESERVED
+  CHECKED_IN
+  CANCELLED
+  EXPIRED
+}
+
+enum SeatZone {
+  WINDOW
+  CENTER
+  QUIET
+  COLLABORATIVE
+}
+
+model User {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  password    String
+  role        Role     @default(EMPLOYEE)
+
+  bookings    Booking[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Cafeteria {
+  id        String   @id @default(uuid())
+  name      String
+  building  String
+  floor     Int
+  capacity  Int
+
+  seats     Seat[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Seat {
+  id               String     @id @default(uuid())
+  seatNumber       String
+  cafeteriaId      String
+
+  zone             SeatZone
+  status           SeatStatus @default(AVAILABLE)
+
+  
+  isWindowSeat     Boolean    @default(false)
+
+  cafeteria        Cafeteria  @relation(fields: [cafeteriaId], references: [id])
+
+  bookings         Booking[]
+
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@unique([cafeteriaId, seatNumber])
+}
+
+model Booking {
+  id            String         @id @default(uuid())
+
+  userId        String
+  seatId        String
+
+  bookingDate   DateTime
+
+  startTime     DateTime
+  endTime       DateTime
+
+  status        BookingStatus @default(RESERVED)
+
+  checkedIn     Boolean @default(false)
+
+  user          User @relation(fields: [userId], references: [id])
+
+  seat          Seat @relation(fields: [seatId], references: [id])
+
+  checkIn       CheckIn?
+
+  createdAt     DateTime @default(now())
+
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+
+  @@index([seatId])
+
+  @@index([bookingDate])
+}
+
+model CheckIn {
+  id String @id @default(uuid())
+
+  bookingId String @unique
+
+  qrToken String
+
+  checkedInAt DateTime?
+
+  booking Booking @relation(fields: [bookingId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+
+
