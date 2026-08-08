@@ -5,15 +5,13 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 enum Role {
   EMPLOYEE
   ADMIN
@@ -42,78 +40,81 @@ enum SeatZone {
 }
 
 model User {
-  id       String @id @default(uuid())
-  name     String
-  email    String @unique
-  password String
-  role     Role   @default(EMPLOYEE)
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  password    String
+  role        Role     @default(EMPLOYEE)
 
-  bookings Booking[]
+  bookings    Booking[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Cafeteria {
-  id       String @id @default(uuid())
-  name     String
-  building String
-  floor    Int
-  capacity Int
+  id        String   @id @default(uuid())
+  name      String
+  building  String
+  floor     Int
+  capacity  Int
 
-  seats Seat[]
+  seats     Seat[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Seat {
-  id          String @id @default(uuid())
-  seatNumber  String
-  cafeteriaId String
+  id               String     @id @default(uuid())
+  seatNumber       String
+  cafeteriaId      String
 
-  zone   SeatZone
-  status SeatStatus @default(AVAILABLE)
+  zone             SeatZone
+  status           SeatStatus @default(AVAILABLE)
 
-  isWindowSeat Boolean @default(false)
+  
+  isWindowSeat     Boolean    @default(false)
 
-  cafeteria Cafeteria @relation(fields: [cafeteriaId], references: [id])
+  cafeteria        Cafeteria  @relation(fields: [cafeteriaId], references: [id])
 
-  bookings Booking[]
+  bookings         Booking[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 
   @@unique([cafeteriaId, seatNumber])
 }
 
 model Booking {
-  id String @id @default(uuid())
+  id            String         @id @default(uuid())
 
-  userId String
-  seatId String
+  userId        String
+  seatId        String
 
-  bookingDate DateTime
+  bookingDate   DateTime
 
-  startTime DateTime
-  endTime   DateTime
+  startTime     DateTime
+  endTime       DateTime
 
-  status BookingStatus @default(RESERVED)
+  status        BookingStatus @default(RESERVED)
 
-  checkedIn Boolean @default(false)
+  checkedIn     Boolean @default(false)
 
-  user User @relation(fields: [userId], references: [id])
+  user          User @relation(fields: [userId], references: [id])
 
-  seat Seat @relation(fields: [seatId], references: [id])
+  seat          Seat @relation(fields: [seatId], references: [id])
 
-  checkIn CheckIn?
+  checkIn       CheckIn?
 
-  createdAt DateTime @default(now())
+  createdAt     DateTime @default(now())
 
-  updatedAt DateTime @updatedAt
+  updatedAt     DateTime @updatedAt
 
   @@index([userId])
+
   @@index([seatId])
+
   @@index([bookingDate])
 }
 
@@ -130,3 +131,6 @@ model CheckIn {
 
   createdAt DateTime @default(now())
 }
+
+
+
