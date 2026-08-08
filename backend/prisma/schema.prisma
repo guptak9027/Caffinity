@@ -12,6 +12,7 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 enum Role {
   EMPLOYEE
   ADMIN
@@ -38,12 +39,17 @@ enum SeatZone {
   QUIET
   COLLABORATIVE
 }
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
 
 model User {
   id          String   @id @default(uuid())
   name        String
   email       String   @unique
-  password    String
+  password    String?
+  provider AuthProvider @default(LOCAL)
   role        Role     @default(EMPLOYEE)
 
   bookings    Booking[]
