@@ -1,6 +1,6 @@
 import prisma from "../../config/prisma";
 import {IUserRepository} from "./interface";
-import {RegisterDTO} from "./types";
+import {RegisterDTO,LoginDTO} from "./types";
 
 export class UserRepository implements IUserRepository {
     async findByEmail(email: string) {
@@ -33,4 +33,5 @@ export class UserRepository implements IUserRepository {
             }
         });
     }
+
 }

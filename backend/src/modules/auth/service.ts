@@ -5,6 +5,7 @@ import {RegisterDTO,LoginDTO,AuthResponse} from "./types";
 import { PasswordUtil } from "../../utils/password";
 import { JwtUtil } from "../../utils/jwt";
 
+// here the main business logic
 export class AuthService implements IAuthService {
     constructor(
         private userRepository: IUserRepository
