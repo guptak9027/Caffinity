@@ -26,7 +26,12 @@ export class AuthService implements IAuthService {
             role: user.role
         });
         return {
-            user,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+    },
             token
         };
 
@@ -38,10 +43,7 @@ export class AuthService implements IAuthService {
         throw new Error("Invalid email or password");
         }
         const isPasswordValid =
-            await PasswordUtil.compare(
-                data.password,
-                user.password
-            );
+            await PasswordUtil.compare( data.password,user.password);
         if (!isPasswordValid) {
             throw new Error("Invalid email or password");
         }
@@ -51,9 +53,21 @@ export class AuthService implements IAuthService {
                 role: user.role
             });
         return {
-            user,
-            token
-        };
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+    }
+            ,token};
+    }
+
+    async getCurrentUser(userId: string) {
+        const user = await this.userRepository.findById(userId);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        return user;
     }
 }
 

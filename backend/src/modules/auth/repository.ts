@@ -1,6 +1,6 @@
 import prisma from "../../config/prisma";
 import {IUserRepository} from "./interface";
-import {RegisterDTO,LoginDTO} from "./types";
+import {RegisterDTO} from "./types";
 
 export class UserRepository implements IUserRepository {
     async findByEmail(email: string) {
@@ -34,4 +34,15 @@ export class UserRepository implements IUserRepository {
         });
     }
 
+    async findById(id: string) {
+        return prisma.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true
+            }
+        });
+    }
 }

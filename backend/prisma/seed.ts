@@ -8,14 +8,12 @@ async function main() {
     await prisma.user.createMany({
     data: [
         {
-        employeeId: "EMP002",
         name: "Krishna Gupta",
         email: "krishna@company.com",
         password,
         role: Role.EMPLOYEE
         },
         {
-        employeeId: "EMP003",
         name: "John Doe",
         email: "john@company.com",
         password,
@@ -54,6 +52,8 @@ async function main() {
     data:seats
 });
 
+}
+
 main()
   .then(async () => {
     await prisma.$disconnect();
@@ -65,4 +65,3 @@ main()
   });
 
 
-}
