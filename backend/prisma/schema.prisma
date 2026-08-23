@@ -45,98 +45,92 @@ enum AuthProvider {
 }
 
 model User {
-  id          String   @id @default(uuid())
-  name        String
-  email       String   @unique
-  password    String?
-  provider AuthProvider @default(LOCAL)
-  role        Role     @default(EMPLOYEE)
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(EMPLOYEE)
 
-  bookings    Booking[]
+  bookings     Booking[]
+  reservations Reservation[]
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Cafeteria {
-  id        String   @id @default(uuid())
-  name      String
-  building  String
-  floor     Int
-  capacity  Int
+  id       String @id @default(uuid())
+  name     String
+  building String
+  floor    Int
+  capacity Int
 
-  seats     Seat[]
+  seats Seat[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Seat {
-  id               String     @id @default(uuid())
-  seatNumber       String
-  cafeteriaId      String
+  id            String     @id @default(uuid())
+  seatNumber    String
+  cafeteriaId   String
+  zone          SeatZone
+  status        SeatStatus @default(AVAILABLE)
+  isWindowSeat  Boolean    @default(false)
 
-  zone             SeatZone
-  status           SeatStatus @default(AVAILABLE)
+  cafeteria Cafeteria @relation(fields: [cafeteriaId], references: [id])
+  bookings  Booking[]
 
-  
-  isWindowSeat     Boolean    @default(false)
-
-  cafeteria        Cafeteria  @relation(fields: [cafeteriaId], references: [id])
-
-  bookings         Booking[]
-
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([cafeteriaId, seatNumber])
 }
 
-model Booking {
-  id            String         @id @default(uuid())
+model Reservation {
+  id          String        @id @default(uuid())
+  userId      String
+  bookingDate DateTime
+  status      BookingStatus @default(RESERVED)
 
-  userId        String
-  seatId        String
+  user     User      @relation(fields: [userId], references: [id])
+  bookings Booking[]
+  checkIn  CheckIn?
 
-  bookingDate   DateTime
-
-  startTime     DateTime
-  endTime       DateTime
-
-  status        BookingStatus @default(RESERVED)
-
-  checkedIn     Boolean @default(false)
-
-  user          User @relation(fields: [userId], references: [id])
-
-  seat          Seat @relation(fields: [seatId], references: [id])
-
-  checkIn       CheckIn?
-
-  createdAt     DateTime @default(now())
-
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
-
-  @@index([seatId])
-
   @@index([bookingDate])
 }
 
+model Booking {
+  id            String @id @default(uuid())
+  reservationId String
+  userId        String
+  seatId        String
+
+  reservation Reservation @relation(fields: [reservationId], references: [id])
+  user        User        @relation(fields: [userId], references: [id])
+  seat        Seat        @relation(fields: [seatId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([reservationId, seatId])
+  @@index([userId])
+  @@index([seatId])
+}
+
 model CheckIn {
-  id String @id @default(uuid())
+  id            String   @id @default(uuid())
+  reservationId String   @unique
+  qrToken       String
+  checkedInAt   DateTime?
 
-  bookingId String @unique
-
-  qrToken String
-
-  checkedInAt DateTime?
-
-  booking Booking @relation(fields: [bookingId], references: [id])
+  reservation Reservation @relation(fields: [reservationId], references: [id])
 
   createdAt DateTime @default(now())
 }
-
 
 
