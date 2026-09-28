@@ -31,28 +31,33 @@ export class AuthService implements IAuthService {
 
     }
     async login(data: LoginDTO){
-        const user = await this.userRepository.findByEmail(data.email);
-        //security practice don't say:"Email doesn't exist" because that can allow attackers to discover which email addresses have accounts.
-        if (!user) {
+    const user = await this.userRepository.findByEmail(data.email);
+
+    if (!user) {
         throw new Error("Invalid email or password");
-        }
-        const isPasswordValid =
-            await PasswordUtil.compare(
-                data.password,
-                user.password
-            );
-        if (!isPasswordValid) {
-            throw new Error("Invalid email or password");
-        }
-        const token =
-            JwtUtil.generateToken({
-                id: user.id,
-                role: user.role
-            });
-        return {
-            user,
-            token
-        };
     }
+
+    if (!user.password) {
+        throw new Error("Invalid email or password");
+    }
+
+    const isPasswordValid =
+        await PasswordUtil.compare(
+            data.password,
+            user.password
+        );
+    if (!isPasswordValid) {
+        throw new Error("Invalid email or password");
+    }
+    const token =
+        JwtUtil.generateToken({
+            id: user.id,
+            role: user.role
+        });
+    return {
+        user,
+        token
+    };
+}
 }
 
